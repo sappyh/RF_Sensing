@@ -1,0 +1,252 @@
+*******************************************************************************
+* Copyright (C) Maxim Integrated Products, Inc., All Rights Reserved.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a
+* copy of this software and associated documentation files (the "Software"),
+* to deal in the Software without restriction, including without limitation
+* the rights to use, copy, modify, merge, publish, distribute, sublicense,
+* and/or sell copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included
+* in all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+* OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+* IN NO EVENT SHALL MAXIM INTEGRATED BE LIABLE FOR ANY CLAIM, DAMAGES
+* OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+* ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*
+* Except as contained in this notice, the name of Maxim Integrated
+* Products, Inc. shall not be used except as stated in the Maxim Integrated
+* Products, Inc. Branding Policy.
+*
+* The mere transfer of this software does not imply any licenses
+* of trade secrets, proprietary technology, copyrights, patents,
+* trademarks, maskwork rights, or any other form of intellectual
+* property whatsoever. Maxim Integrated Products, Inc. retains all
+* ownership rights.
+**************************************************************************************
+* The MAX9060 is a small single comparator. It has open-drain output.
+* It feature an input voltage range of -0.3V to +5.5V independent of supply voltage
+**************************************************************************************
+.SUBCKT MAX9060 REF VCC  GND   IN OUT
+*				|	 |	  |	    |  |
+*				|	 |	  |     |  COMPARATOR OUTPUT
+*				|	 |	  |		|
+*				|	 |	  |		COMPARATOR INPUT
+*				|	 |	  |
+*				|	 |	  GROUND
+*				|	 |
+*				|	 POWER SUPPLY
+*				|
+*				EXTERNAL REFERENCE INPUT
+*
+*
+* Date of model creation: 
+*      
+*
+* Revision History: 
+*      
+*
+* Recommendations:
+*     	Use SIMETRIX (or SPICE 2G6; other simulators may require translation)
+*     	For a quick, effective design, use a combination of: data sheet
+* 	    specs, bench testing, and simulations with this macromodel
+*
+* Supported:
+*	  	OUTPUT VOLTAGE LIMITS,OUTPUT CURRENT LIMIT,SUPPLY VOLTAGE LIMITS,SUPPLY VOLTAGE DEPENDENT CURRENT LIMIT
+*	  	RISE AND FALL TIMES,PROPAGATION DELAY,INPUT REFERED HYSTERISIS 
+*
+*
+* Not Supported:
+*     	Variation in specs vs. Temperature variation
+*		This model will not operate at temperatures outside 27 degrees C.
+*
+* Known Discrepancies in Model vs. Datasheet:
+*      	Input Bias Current VS Input Bias Voltage is staircase waveform in datasheet. But simulation result is linear.
+*
+*
+XCOMP REF VCC GND IN OUT COMP
+.ENDS MAX9060
+**************************************************************************************
+.SUBCKT COMP 500 18_1 18 55 56
+* 10 = VCC
+* 18 = VEE
+* 55 = IN+
+* 23 = IN-
+* 56 = OUT
+*****************
+E501 501 18 500 18 1
+Gton 18 502 500 18 0.3333333e-6
+Cton 502 18 1n
+Dton 502 501 DA
+E500 10 18 502 18 1
+Rref 23 500 0.001
+Vbias1 55 305 0
+Fbias1 55 18 Vbias1 -1
+Gbias1 55 18 55 18 4.727e-9
+Sleak1 55 700 500 18 smod2
+Vleak1 700 18 11
+VS1 10 11 0V    
+RNC1 11 12 200K
+RNC2 11 13 200K
+IPBIAS 11 14 260NA
+RBIAS 14 25 10G
+RPE1 15 14 10M
+RPE2 16 14 10M
+Q1 20 22 15 QPA
+Q2 21 23 16 QPB
+Q3 12 22 19 QNA
+Q4 13 23 24 QNB
+RNE1 19 17 10M
+RNE2 24 17 10M
+INBIAS 17 18 260NA
+RPC1 20 18 200K
+RPC2 21 18 200K
+FSUP 18 10 VS1 1 
+VOS 29 30 -10.5M
+EPSRR 30 67 10 18 2.238721M
+ECMRR 67 304 14 18 0.5M
+*INPUT PROTECTION DIODES 
+DIN1 304 73 DA
+DIN2 74 304 DA
+DIN3 23 73 DA
+DIN4 74 23 DA
+VINL1 73 301 0.1
+Vinmax 301 302 5.5
+VINL2 303 74 0.1
+Vinmin 303 18 -0.3
+Rleakage 304 305 300g
+Sleak 304 305 500 18 smod
+*****************
+EG 25 18 10 18 0.5 
+*****************
+*INPUT REFERED HYSTERISIS
+GH 25 26 21 20 1
+RH 25 26 1MEG
+CH 26 27 10P
+DL1 26 27 DA  
+VL1 27 25 1V
+DL2 28 26 DA
+VL2 25 28 1V
+EHYST 22 29 26 25 0.9m
+*****************
+*PROPAGATION DELAY 
+GPS1 25 69 26 25 10M
+RPS1 69 25 1MEG
+DPS1 69 70 DA
+VPS1 70 71 0.35
+EPS1 71 25 66 65 184M 
+DPS2 72 69 DA
+VPS2 25 72 0.68V
+GPS2 25 33 69 25 1316.4U
+CS3 69 25 0.1P
+CP 33 25 15N
+DPS3 31 33 DA
+VPS3 25 31 1V
+DPS4 33 32 DA
+VPS4 32 25 1V
+********* 
+EP2 34 25 33 25 1
+EHP 35 34 37 25 283M
+RP3 35 36 1K
+VIS1 36 25 0V
+FP1 25 37 VIS1 10
+RP4 37 25 1MEG
+DP3 37 38 DA
+DP4 39 37 DA
+VP1 38 25 1V
+VP2 25 39 1V
+CP1 37 25 10P
+*****************
+*OUTPUT VOLTAGE LIMITS
+GOUT 25 40 37 25 1M
+ROUT 40 25 5K
+DOL1 40 200 DA
+DOL2 201 40 DA
+EOL1 41 25 10 18 0.5 
+EOL2 25 42 10 18 0.5
+COL 40 25 1P
+*****************
+*RISE AND FALL TIMES
+EOUT1 43 25 40 25 1
+DT1 43 44 DA
+DT2 45 43 DA
+RT1 44 46 10K
+RT2 45 46 1K
+CT1 46 25 4P
+*****************
+*OUTPUT CURRENT LIMIT
+EOUT2 47 25 46 25 1
+ROUT2 47 202 40
+DCL1 48 49 DB
+DCL2 50 48 DB
+DCL3 51 49 DB
+DCL4 50 51 DB
+ICL 49 50 8M
+Hs1 41 200 VHs1 320
+Hs2 42 201 VHs2 122
+VHs1 202 203 0
+VHs2 203 401 0
+Eoutleak 402 25 47 25 -1
+
+G900 18 900 500 18 1e-7
+C900 18 900 1n
+E900 903 18 500 18 1
+D900 900 903 DA
+E901 902 18 900 18 1
+Soutleak 401 403 402 25 smod3
+S0Vopen 403 404 500 18 smod4
+S3delay 404 48 902 18 smod5
+*SUPPLY VOLTAGE DEPENDENT CURRENT LIMIT 
+GCL 49 50 52 53 10M 
+EVR 52 25 10 18 1
+RVR 52 53 1MEG
+DVR 53 54 DA
+VVR 54 25 1.8V
+*****************
+*SUPPLY CURRENT
+ISUP 500 18 25NA
+VIS2 51 56 0V
+FSUP1 25 57 VIS2 1.28
+DSUP1 25 57 DB
+DSUP2 57 58 DB 
+VIS3 58 25 0V
+FSUP2 10 18 VIS3 0.00035
+Gsup11 500 18 10 18 26.44444n
+*****************
+*SUPPLY VOLTAGE LIMITS
+DBIAS 18 14 DA
+EMAX 59 25 10 18 1
+DMAX 59 60 DA
+RMAX 60 61 1K
+VMAX 61 25 5.5V
+FMAX 14 18 VMAX 0.1
+******
+EMIN 62 25 10 18 1
+DMIN 63 62 DA
+RMIN 64 63 1K
+VMIN 64 25 0.9
+FMIN 14 18 VMIN 0.1
+******************
+EREF1 65 25 10 18 1
+RREF1 65 66 1MEG
+VREF1 66 25 5V
+**********************************************************
+.MODEL QPA PNP(IS=800E-18 BF=3600)
+.MODEL QNA NPN(IS=800E-18 BF=3600)
+.MODEL QPB PNP(IS=800E-18 BF=2220)
+.MODEL QNB NPN(IS=800E-18 BF=2220)
+.MODEL DA D(N=0.1M)
+.MODEL DB D(IS=100E-14)
+.model smod Vswitch(ron=1m roff=500g Von=0.8 voff=0.5 )
+.model smod1 Vswitch(ron=1m roff=500g Von=2.15 voff=2.1 )
+.model smod2 Vswitch(ron=500g roff=212meg Von=0.8 voff=0.1 )
+.model smod3 Vswitch(ron=1m roff=300g Von=-0.1 voff=-0.5 )
+.model smod4 Vswitch(ron=1m roff=500g Von=0.6 voff=0.3 )
+.model smod5 Vswitch(ron=1m roff=500g Von=0.9 voff=0.1 )
+**********************************************************
+.ENDS COMP
